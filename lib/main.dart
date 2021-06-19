@@ -9,34 +9,46 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:ots_driver_app/Models/rideDetails.dart';
+import 'package:ots_driver_app/Notifications/pushNotificationService.dart';
 import 'package:ots_driver_app/Screens/InfoForm.dart';
 import 'package:ots_driver_app/Screens/accountPage.dart';
 import 'package:ots_driver_app/Screens/mapPage.dart';
+import 'package:ots_driver_app/Screens/rideAlertDailog.dart';
 import 'package:ots_driver_app/utilities/constants.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 late final DatabaseReference db;
-Future<void> _messageHandler(RemoteMessage message) async {
-  print('background message ${message.notification!.body}');
-}
+PushNotifications pushNotifications = PushNotifications();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  'This channel is used for important notifications.', // description
+  importance: Importance.max,
+);
 
 Future<void> main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
     final FirebaseApp app = await Firebase.initializeApp();
     db = FirebaseDatabase(app: app).reference();
+
     await Firebase.initializeApp();
   } on FirebaseException catch (e) {
     print(e.message);
   }
-  FirebaseMessaging.onBackgroundMessage(_messageHandler);
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage event) {
-    print("message recieved");
-    print(event.notification!.body);
-  });
-  FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    print('Message clicked!');
-  });
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
   runApp(MyApp());
 }
 
@@ -62,7 +74,67 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  DatabaseReference rideReqRef = db.child("ride_requests");
+  RideDetails rideDetails = RideDetails();
+  late String rideID;
+
+  void initState() {
+    super.initState();
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    var initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+    Future<void> _messageHandler(RemoteMessage message) async {
+      print('background message ${message.notification!.body}');
+      retrieveRideDetails(rideID, context);
+    }
+
+    FirebaseMessaging.onBackgroundMessage(_messageHandler);
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      rideID = event.data["ride-request-id"];
+
+      print("Ride Request ID _____________!");
+      print(rideID);
+      RemoteNotification? notification = event.notification;
+      AndroidNotification? android = event.notification?.android;
+
+      // If `onMessage` is triggered with a notification, construct our own
+      // local notification to show to users using the created channel.
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                icon: android.smallIcon,
+                // other properties...
+              ),
+            ));
+      }
+      print("!------------message recieved");
+      retrieveRideDetails(rideID, context);
+      print(event.notification!.body);
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      setState(() {
+        rideID = message.data["ride-request-id"].toString();
+      });
+      print("Ride Request ID _____________!");
+      print(rideID);
+      print("!------!");
+      retrieveRideDetails(rideID, context);
+      print('Message clicked!');
+    });
+  }
 
   Widget _buildSignUpBtn(BuildContext context) {
     return Container(
@@ -93,6 +165,60 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           )),
     );
+  }
+
+  Future retrieveRideDetails(String rideReqID, BuildContext context) async {
+    late DataSnapshot result;
+    if (rideReqID.isNotEmpty) {
+      print("ride_req Id : " + rideReqID);
+      try {
+        await db
+            .child("ride_requests")
+            .child(rideReqID)
+            .once()
+            .then((DataSnapshot data) {
+          result = data;
+          if (result.value != null) {
+            double pickUpLocLat =
+                double.parse(result.value['pickup']['latitude'].toString());
+            double pickUpLocLong =
+                double.parse(result.value['pickup']['longitude'].toString());
+            double dropOffLocLat =
+                double.parse(result.value['dropoff']['latitude'].toString());
+            double dropoffLocLong =
+                double.parse(result.value['dropoff']['longitude'].toString());
+
+            String pickUpAddress = result.value['pickup_address'].toString();
+
+            String dropOffAddress = result.value['dropoff_address'].toString();
+            String userName = result.value['username'].toString();
+            String userPhone = result.value['userphone'].toString();
+            String userPhoto = result.value['userphotourl'].toString();
+            setState(() {
+              rideDetails.pickUpLatLong = LatLng(pickUpLocLat, pickUpLocLong);
+              rideDetails.dropOffLatLong =
+                  LatLng(dropOffLocLat, dropoffLocLong);
+              rideDetails.pickUpAddress = pickUpAddress;
+              rideDetails.dropOffAddress = dropOffAddress;
+              rideDetails.userName = userName;
+              rideDetails.userPhotoURL = userPhoto;
+              rideDetails.userPhone = userPhone;
+            });
+            print(rideDetails);
+          }
+          // ignore: unnecessary_null_comparison
+        });
+      } on FirebaseException catch (e) {
+        print(e.message);
+      }
+      //print(result.value);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => RideAlerts(
+          rideDetails: rideDetails,
+        ),
+      );
+    }
   }
 
   String phone = FirebaseAuth.instance.currentUser!.phoneNumber.toString();

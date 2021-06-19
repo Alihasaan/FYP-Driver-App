@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:ots_driver_app/main.dart';
+import 'dart:io' show Platform;
 
 class PushNotifications {
   final FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -17,5 +18,14 @@ class PushNotifications {
         .child("token")
         .set(token);
     messaging.subscribeToTopic("alllDrivers");
+    messaging.subscribeToTopic("alllUsers");
+  }
+
+  String? getRideRequestId(Map<String, dynamic> message) {
+    if (Platform.isAndroid) {
+      print("!-----------------!");
+      print(message["ride-request-id"]);
+      return message["ride-request-id"];
+    } else {}
   }
 }
