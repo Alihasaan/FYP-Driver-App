@@ -23,7 +23,7 @@ class _MapPageState extends State<MapPage> {
   late DatabaseReference DBref = widget.refDB
       .child("Drivers")
       .child(FirebaseAuth.instance.currentUser!.uid)
-      .child("newRide");
+      .child("driver_status");
 
   Completer<GoogleMapController> _controller = Completer();
   late GoogleMapController newGoogleMapController;
@@ -85,7 +85,7 @@ class _MapPageState extends State<MapPage> {
                       floatingActionButtonLocation:
                           FloatingActionButtonLocation.centerFloat,
                       floatingActionButton: Container(
-                        child: dataResult.value["driver_status"] == "off"
+                        child: dataResult.value["driver_status"] == "offline"
                             ? Padding(
                                 padding: const EdgeInsets.only(bottom: 100),
                                 child: FloatingActionButton.extended(
@@ -133,11 +133,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   void makeDriverOnline() async {
-    db
-        .child("Drivers")
-        .child(FirebaseAuth.instance.currentUser!.uid)
-        .child("driver_status")
-        .set({"driver_status": "on"});
+    DBref.set({"driver_status": "online-searching"});
     print("!----------------------------Driver Status Updated");
     await Geofire.initialize("availableDrivers");
     await Geofire.setLocation(FirebaseAuth.instance.currentUser!.uid,
@@ -147,14 +143,11 @@ class _MapPageState extends State<MapPage> {
   }
 
   void makeDriverOffline() async {
-    db
-        .child("Drivers")
-        .child(FirebaseAuth.instance.currentUser!.uid)
-        .child("driver_status")
-        .set({"driver_status": "off"});
+    DBref.set({"driver_status": "offline"});
     await Geofire.removeLocation(FirebaseAuth.instance.currentUser!.uid);
+    removeQueryListener();
     DBref.onDisconnect();
-    DBref.remove();
+
     mapPageStreamSub.cancel();
   }
 

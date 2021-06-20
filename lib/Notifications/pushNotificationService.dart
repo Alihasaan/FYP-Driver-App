@@ -17,8 +17,8 @@ class PushNotifications {
         .child(FirebaseAuth.instance.currentUser!.uid)
         .child("token")
         .set(token);
-    messaging.subscribeToTopic("alllDrivers");
-    messaging.subscribeToTopic("alllUsers");
+    messaging.subscribeToTopic("allDrivers");
+    messaging.subscribeToTopic("allUsers");
   }
 
   String? getRideRequestId(Map<String, dynamic> message) {

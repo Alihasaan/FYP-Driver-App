@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ots_driver_app/AuthService.dart';
 import 'package:ots_driver_app/LoginScreen.dart';
@@ -27,7 +28,30 @@ class _AccountPageState extends State<AccountPage> {
   late DataSnapshot dataResult;
   // ignore: avoid_init_to_null
   File? _image;
+  bool imgSelected = false;
   final ImagePicker _picker = ImagePicker();
+  bool uploadingImg = false;
+  Widget imgShow() {
+    return FirebaseAuth.instance.currentUser!.photoURL == null
+        ? SizedBox(
+            width: 150,
+            height: 150,
+            child: _image == null
+                ? Image.network(
+                    "https://cdn2.iconfinder.com/data/icons/avatars-99/62/avatar-370-456322-512.png",
+                    fit: BoxFit.fill,
+                  )
+                : Image.file(File(_image!.path), fit: BoxFit.cover))
+        : SizedBox(
+            width: 150,
+            height: 150,
+            child: Image.network(
+              FirebaseAuth.instance.currentUser!.photoURL.toString(),
+              fit: BoxFit.fill,
+            ),
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     Future getImage() async {
@@ -39,6 +63,7 @@ class _AccountPageState extends State<AccountPage> {
       }
       setState(() {
         _image = File(image!.path);
+        imgSelected = true;
         print(_image!.path);
       });
     }
@@ -57,60 +82,175 @@ class _AccountPageState extends State<AccountPage> {
         res.ref.getDownloadURL().then((value) =>
             FirebaseAuth.instance.currentUser!.updateProfile(photoURL: value));
         print(res.ref.getDownloadURL());
-        SnackBar(content: Text("Image Upload Successfully"));
+
+        Fluttertoast.showToast(msg: "Image Updated Successfully!");
       });
     }
 
     return Scaffold(
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: CircleAvatar(
-                  radius: 80,
-                  backgroundColor: primary,
-                  child: ClipOval(
-                    child: SizedBox(
-                        width: 150,
-                        height: 150,
-                        child:
-                            FirebaseAuth.instance.currentUser!.photoURL == null
-                                ? _image == null
-                                    ? Image.network(
-                                        "https://cdn2.iconfinder.com/data/icons/avatars-99/62/avatar-370-456322-512.png",
-                                        fit: BoxFit.fill,
-                                      )
-                                    : Image.file(File(_image!.path),
-                                        fit: BoxFit.cover)
-                                : Image.network(
-                                    FirebaseAuth.instance.currentUser!.photoURL
-                                        .toString(),
-                                    fit: BoxFit.cover,
-                                  )),
-                  ),
-                ),
+          SizedBox(
+            height: 35,
+          ),
+          Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Center(
+                child: Text("Your Account",
+                    style: TextStyle(
+                      color: Colors.white,
+                      letterSpacing: 1.5,
+                      fontSize: 27.0,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'OpenSans',
+                    )),
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 60),
-                child: Container(
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.add_a_photo,
-                      size: 30,
+              decoration: BoxDecoration(
+                color: primary,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 70,
+              width: 370),
+          SizedBox(
+            height: 15,
+          ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 15,
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    decoration: BoxDecoration(
                       color: primary,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(width: 10, color: primary),
                     ),
-                    onPressed: () {
-                      getImage();
-                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: imgSelected == false
+                          ? imgShow()
+                          : SizedBox(
+                              width: 150,
+                              height: 150,
+                              child: Image.file(File(_image!.path),
+                                  fit: BoxFit.cover),
+                            ),
+                    ),
                   ),
                 ),
-              )
-            ],
+                Padding(
+                  padding: EdgeInsets.only(top: 60),
+                  child: Container(
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.add_a_photo,
+                        size: 30,
+                        color: primary,
+                      ),
+                      onPressed: () {
+                        getImage();
+                      },
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(bottom: 100),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text("Driver",
+                            style: TextStyle(
+                              color: Colors.lightGreen,
+                              letterSpacing: 1.5,
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'OpenSans',
+                            )),
+                      ),
+                      Container(
+                        child: Text("Ali Hassan",
+                            style: TextStyle(
+                              color: Colors.black38,
+                              letterSpacing: 1.5,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'OpenSans',
+                            )),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              child: Text("Phone Number:",
+                                  style: TextStyle(
+                                    color: Colors.lightGreen,
+                                    letterSpacing: 1.5,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'OpenSans',
+                                  )),
+                            ),
+                            Container(
+                              child: Text("03035271607",
+                                  style: TextStyle(
+                                    color: Colors.black38,
+                                    letterSpacing: 1.5,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'OpenSans',
+                                  )),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              child: Text("CNIC:",
+                                  style: TextStyle(
+                                    color: Colors.lightGreen,
+                                    letterSpacing: 1.5,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'OpenSans',
+                                  )),
+                            ),
+                            Container(
+                              child: Text("1234567891236",
+                                  style: TextStyle(
+                                    color: Colors.black38,
+                                    letterSpacing: 1.5,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'OpenSans',
+                                  )),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           FutureBuilder(
             future: widget.refDB
@@ -273,15 +413,33 @@ class _AccountPageState extends State<AccountPage> {
                               ? SizedBox()
                               : Container(
                                   padding: EdgeInsets.all(10),
-                                  color: primary,
+                                  decoration: BoxDecoration(
+                                    color: primary,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                   child: TextButton(
-                                      onPressed: () {
-                                        uploadPic(context);
+                                      onPressed: () async {
+                                        setState(() {
+                                          uploadingImg = true;
+                                        });
+
+                                        await uploadPic(context);
+                                        Fluttertoast.showToast(
+                                            msg: "Image Updating.....");
+                                        setState(() {
+                                          uploadingImg = false;
+                                        });
                                       },
-                                      child: Text(
-                                        "Save Image",
-                                        style: TextStyle(color: Colors.white),
-                                      )),
+                                      child: uploadingImg == false
+                                          ? Text(
+                                              "Save Image",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )
+                                          : CircularProgressIndicator(
+                                              color: Colors.white,
+                                            )),
                                 )
                         ],
                       )

@@ -1,6 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class RideDetails {
+  String? rideId;
   LatLng? pickUpLatLong;
   LatLng? dropOffLatLong;
   String? pickUpAddress;

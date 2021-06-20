@@ -74,7 +74,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  DatabaseReference rideReqRef = db.child("ride_requests");
+  /*DatabaseReference rideReqRef = db.child("ride_requests");
   RideDetails rideDetails = RideDetails();
   late String rideID;
 
@@ -130,12 +130,17 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       print("Ride Request ID _____________!");
       print(rideID);
+      Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+              builder: (BuildContext context) =>
+                  MyHomePage(title: "Taxi Driver App")));
       print("!------!");
       retrieveRideDetails(rideID, context);
       print('Message clicked!');
     });
   }
-
+*/
   Widget _buildSignUpBtn(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
@@ -167,6 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+/*
   Future retrieveRideDetails(String rideReqID, BuildContext context) async {
     late DataSnapshot result;
     if (rideReqID.isNotEmpty) {
@@ -220,7 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
   }
-
+*/
   String phone = FirebaseAuth.instance.currentUser!.phoneNumber.toString();
   String? name = FirebaseAuth.instance.currentUser!.displayName;
   @override
@@ -260,7 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           : Image.network(
                               FirebaseAuth.instance.currentUser!.photoURL
                                   .toString(),
-                              fit: BoxFit.cover)),
+                              fit: BoxFit.fill)),
                 ),
               ),
             ),
@@ -299,6 +305,132 @@ class MyStatefulWidget extends StatefulWidget {
 }
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  DatabaseReference rideReqRef = db.child("ride_requests");
+  RideDetails rideDetails = RideDetails();
+  late String rideID;
+
+  void initState() {
+    super.initState();
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    var initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+
+    Future<void> _messageHandler(RemoteMessage message) async {
+      print('background message ${message.notification!.body}');
+      setState(() {
+        rideID = message.data["ride-request-id"].toString();
+      });
+      retrieveRideDetails(rideID, context);
+    }
+
+    FirebaseMessaging.onBackgroundMessage(_messageHandler);
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      rideID = event.data["ride-request-id"];
+
+      print("Ride Request ID _____________!");
+      print(rideID);
+
+      RemoteNotification? notification = event.notification;
+      AndroidNotification? android = event.notification?.android;
+
+      // If `onMessage` is triggered with a notification, construct our own
+      // local notification to show to users using the created channel.
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                icon: android.smallIcon,
+                // other properties...
+              ),
+            ));
+      }
+      print("!------------message recieved");
+      retrieveRideDetails(rideID, context);
+      print(event.notification!.body);
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      setState(() {
+        rideID = message.data["ride-request-id"].toString();
+      });
+      print("Ride Request ID _____________!");
+      print(rideID);
+
+      print("!------!");
+      retrieveRideDetails(rideID, context);
+      print('Message clicked!');
+    });
+  }
+
+  Future retrieveRideDetails(String rideReqID, BuildContext context) async {
+    late DataSnapshot result;
+    if (rideReqID.isNotEmpty) {
+      print("ride_req Id : " + rideReqID);
+      try {
+        await db
+            .child("ride_requests")
+            .child(rideReqID)
+            .once()
+            .then((DataSnapshot data) {
+          result = data;
+          if (result.value != null) {
+            double pickUpLocLat =
+                double.parse(result.value['pickup']['latitude'].toString());
+            double pickUpLocLong =
+                double.parse(result.value['pickup']['longitude'].toString());
+            double dropOffLocLat =
+                double.parse(result.value['dropoff']['latitude'].toString());
+            double dropoffLocLong =
+                double.parse(result.value['dropoff']['longitude'].toString());
+
+            String pickUpAddress = result.value['pickup_address'].toString();
+
+            String dropOffAddress = result.value['dropoff_address'].toString();
+            String userName = result.value['username'].toString();
+            String userPhone = result.value['userphone'].toString();
+            String userPhoto = result.value['userphotourl'].toString();
+
+            setState(() {
+              rideDetails.rideId = rideReqID;
+              rideDetails.pickUpLatLong = LatLng(pickUpLocLat, pickUpLocLong);
+              rideDetails.dropOffLatLong =
+                  LatLng(dropOffLocLat, dropoffLocLong);
+              rideDetails.pickUpAddress = pickUpAddress;
+              rideDetails.dropOffAddress = dropOffAddress;
+              rideDetails.userName = userName;
+              rideDetails.userPhotoURL = userPhoto;
+              rideDetails.userPhone = userPhone;
+            });
+            print(rideDetails);
+            if (data.value["ride-status"].toString() == "waiting")
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => RideAlerts(
+                  rideDetails: rideDetails,
+                ),
+              );
+          }
+          // ignore: unnecessary_null_comparison
+        });
+      } on FirebaseException catch (e) {
+        print(e.message);
+      }
+      //print(result.value);
+
+    }
+  }
+
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);

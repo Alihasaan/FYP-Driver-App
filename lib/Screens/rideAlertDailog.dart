@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:ots_driver_app/Models/rideDetails.dart';
+import 'package:ots_driver_app/main.dart';
 import 'package:ots_driver_app/utilities/constants.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Constants {
   Constants._();
@@ -12,7 +16,10 @@ class RideAlerts extends StatelessWidget {
   final RideDetails rideDetails;
 
   RideAlerts({Key? key, required this.rideDetails}) : super(key: key);
-
+  DatabaseReference driverRideRef = db
+      .child("Drivers")
+      .child(FirebaseAuth.instance.currentUser!.uid)
+      .child("newRide");
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -49,26 +56,61 @@ class RideAlerts extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Center(
-                child: Column(
+                child: Text(
+                  "New Ride Request!",
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: primary),
+                ),
+              ),
+              Divider(
+                color: Colors.indigoAccent,
+                height: 30,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      rideDetails.userName.toString(),
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: primary,
+                      child: ClipOval(
+                        child: SizedBox(
+                            width: 80,
+                            height: 80,
+                            child: Image.network(
+                                rideDetails.userPhotoURL.toString())),
+                      ),
                     ),
-                    Text(rideDetails.userPhone.toString(),
-                        style: TextStyle(
-                          color: Colors.black,
-                          letterSpacing: 1.5,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'OpenSans',
-                        ))
+                    SizedBox(
+                      width: 21,
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          rideDetails.userName.toString(),
+                          style: TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.w600),
+                        ),
+                        Text(rideDetails.userPhone.toString(),
+                            style: TextStyle(
+                              color: Colors.black,
+                              letterSpacing: 1.5,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'OpenSans',
+                            ))
+                      ],
+                    ),
                   ],
                 ),
               ),
               SizedBox(
-                height: 15,
+                height: 25,
               ),
               Text("From : ",
                   style: TextStyle(
@@ -137,15 +179,11 @@ class RideAlerts extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: 35,
+                height: 25,
               ),
               Divider(
-                color: primary,
-                height: 20,
-                thickness: 06,
-              ),
-              SizedBox(
-                height: 35,
+                color: Colors.indigoAccent,
+                height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -154,7 +192,7 @@ class RideAlerts extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.redAccent,
+                        color: Colors.red,
                         shape: BoxShape.rectangle,
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -163,8 +201,8 @@ class RideAlerts extends StatelessWidget {
                             Navigator.of(context).pop();
                           },
                           child: Text(
-                            "Decline",
-                            style: TextStyle(fontSize: 18),
+                            "Decline".toUpperCase(),
+                            style: TextStyle(fontSize: 18, color: Colors.white),
                           )),
                     ),
                   ),
@@ -175,17 +213,19 @@ class RideAlerts extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.greenAccent,
+                        color: primary,
                         shape: BoxShape.rectangle,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: FlatButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            await driverRideRef.set(rideDetails.rideId);
+                            checkRideAvailability(context);
                             Navigator.of(context).pop();
                           },
                           child: Text(
-                            "Accept",
-                            style: TextStyle(fontSize: 18),
+                            "Accept".toUpperCase(),
+                            style: TextStyle(fontSize: 18, color: Colors.white),
                           )),
                     ),
                   )
@@ -201,12 +241,12 @@ class RideAlerts extends StatelessWidget {
             backgroundColor: Colors.transparent,
             radius: Constants.avatarRadius,
             child: CircleAvatar(
-                radius: 150,
-                backgroundColor: Colors.white,
+                radius: 200,
+                backgroundColor: Colors.transparent,
                 child: ClipOval(
                     child: SizedBox(
-                  width: 180,
-                  height: 120,
+                  width: 150,
+                  height: 100,
                   child: Image.asset(
                     "assets/taxi.png",
                     fit: BoxFit.contain,
@@ -216,5 +256,29 @@ class RideAlerts extends StatelessWidget {
         ) // top part
       ],
     );
+  }
+
+  void checkRideAvailability(context) {
+    driverRideRef.once().then((DataSnapshot data) {
+      String rideId = "";
+      if (data.value != null) {
+        rideId = data.value.toString();
+      } else {
+        Fluttertoast.showToast(msg: "Ride not Exist");
+      }
+      if (rideId == rideDetails.rideId) {
+        driverRideRef.set("ride-accepted");
+        db
+            .child("ride_requests")
+            .child(rideId)
+            .child("ride-status")
+            .set("Accepted");
+        db
+            .child("ride_requests")
+            .child(rideId)
+            .child("driver_id")
+            .set(FirebaseAuth.instance.currentUser!.uid);
+      }
+    });
   }
 }
