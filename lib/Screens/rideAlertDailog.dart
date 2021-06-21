@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:ots_driver_app/Models/rideDetails.dart';
+import 'package:ots_driver_app/Screens/mapPage.dart';
 import 'package:ots_driver_app/main.dart';
 import 'package:ots_driver_app/utilities/constants.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -55,18 +56,22 @@ class RideAlerts extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Center(
-                child: Text(
-                  "New Ride Request!",
-                  style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      color: primary),
+              Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: primary,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              ),
-              Divider(
-                color: Colors.indigoAccent,
-                height: 30,
+                child: Center(
+                  child: Text(
+                    "New Ride Request!",
+                    style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white),
+                  ),
+                ),
               ),
               SizedBox(
                 height: 20,
@@ -169,7 +174,7 @@ class RideAlerts extends StatelessWidget {
                     ),
                     Text(rideDetails.dropOffAddress.toString(),
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.black87,
                           letterSpacing: 1.5,
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -182,8 +187,8 @@ class RideAlerts extends StatelessWidget {
                 height: 25,
               ),
               Divider(
-                color: Colors.indigoAccent,
-                height: 30,
+                color: Colors.green,
+                height: 20,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -221,7 +226,13 @@ class RideAlerts extends StatelessWidget {
                           onPressed: () async {
                             await driverRideRef.set(rideDetails.rideId);
                             checkRideAvailability(context);
-                            Navigator.of(context).pop();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MapPage(
+                                          refDB: db,
+                                          rideInfo: rideDetails,
+                                        )));
                           },
                           child: Text(
                             "Accept".toUpperCase(),

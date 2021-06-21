@@ -297,6 +297,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+RideDetails rideD = RideDetails();
+
 class MyStatefulWidget extends StatefulWidget {
   const MyStatefulWidget({Key? key}) : super(key: key);
 
@@ -413,6 +415,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               rideDetails.userPhone = userPhone;
             });
             print(rideDetails);
+            rideD = rideDetails;
             if (data.value["ride-status"].toString() == "waiting")
               showDialog(
                 context: context,
@@ -431,12 +434,22 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     }
   }
 
+  Widget getMapPage() {
+    return MapPage(
+      refDB: db,
+      rideInfo: rideDetails,
+    );
+  }
+
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
     MyHomePage(title: "Taxi Driver App"),
-    MapPage(refDB: db),
+    MapPage(
+      refDB: db,
+      rideInfo: rideD,
+    ),
     AccountPage(refDB: db)
   ];
 
