@@ -87,35 +87,40 @@ class _MapPageState extends State<MapPage> {
                   ? Scaffold(
                       floatingActionButtonLocation:
                           FloatingActionButtonLocation.centerFloat,
-                      floatingActionButton: Container(
-                        margin: widget.rideInfo.rideId != null
-                            ? EdgeInsets.only(left: 150, bottom: 220)
-                            : null,
-                        child: dataResult.value["driver_status"] == "offline"
-                            ? Padding(
-                                padding: const EdgeInsets.only(bottom: 100),
-                                child: FloatingActionButton.extended(
-                                    backgroundColor: primary,
-                                    onPressed: () {
-                                      getLiveLocationUpdates();
-                                      makeDriverOnline();
-                                    },
-                                    label: Text('Go Online'),
-                                    icon: Icon(
-                                        Icons.insert_chart_outlined_outlined)))
-                            : Padding(
-                                padding: const EdgeInsets.only(bottom: 100),
-                                child: FloatingActionButton.extended(
-                                    backgroundColor: Colors.lightGreen,
-                                    onPressed: () {
-                                      makeDriverOffline();
-                                      removeQueryListener();
-                                    },
-                                    label: Text('Your Online'),
-                                    icon: Icon(
-                                        Icons.insert_chart_outlined_outlined)),
-                              ),
-                      ),
+                      floatingActionButton: widget.rideInfo.rideId == null
+                          ? Container(
+                              margin: widget.rideInfo.rideId != null
+                                  ? EdgeInsets.only(left: 150, bottom: 220)
+                                  : null,
+                              child: dataResult.value["driver_status"] ==
+                                      "offline"
+                                  ? Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 100),
+                                      child: FloatingActionButton.extended(
+                                          backgroundColor: primary,
+                                          onPressed: () {
+                                            getLiveLocationUpdates();
+                                            makeDriverOnline();
+                                          },
+                                          label: Text('Go Online'),
+                                          icon: Icon(Icons
+                                              .insert_chart_outlined_outlined)))
+                                  : Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 100),
+                                      child: FloatingActionButton.extended(
+                                          backgroundColor: Colors.lightGreen,
+                                          onPressed: () {
+                                            makeDriverOffline();
+                                            removeQueryListener();
+                                          },
+                                          label: Text('Your Online'),
+                                          icon: Icon(Icons
+                                              .insert_chart_outlined_outlined)),
+                                    ),
+                            )
+                          : SizedBox(),
                       body: Stack(
                         children: [
                           GoogleMap(
@@ -168,7 +173,7 @@ class _MapPageState extends State<MapPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             SizedBox(
-                                              height: 15,
+                                              height: 5,
                                             ),
                                             Center(
                                               child: Text("Rider Details",
@@ -197,9 +202,16 @@ class _MapPageState extends State<MapPage> {
                                                   ),
                                                   CircleAvatar(
                                                     radius: 30,
-                                                    child: Image.network(widget
-                                                        .rideInfo.userPhotoURL
-                                                        .toString()),
+                                                    backgroundColor: primary,
+                                                    child: ClipOval(
+                                                      child: SizedBox(
+                                                          width: 80,
+                                                          height: 80,
+                                                          child: Image.network(
+                                                              widget.rideInfo
+                                                                  .userPhotoURL
+                                                                  .toString())),
+                                                    ),
                                                   ),
                                                   SizedBox(
                                                     width: 10,
@@ -290,7 +302,7 @@ class _MapPageState extends State<MapPage> {
                                               ),
                                             ),
                                             SizedBox(
-                                              height: 15,
+                                              height: 5,
                                             ),
                                             Text("To: ",
                                                 style: TextStyle(
@@ -299,7 +311,7 @@ class _MapPageState extends State<MapPage> {
                                                   fontFamily: 'OpenSans',
                                                 )),
                                             SizedBox(
-                                              height: 10,
+                                              height: 5,
                                             ),
                                             Container(
                                               padding:

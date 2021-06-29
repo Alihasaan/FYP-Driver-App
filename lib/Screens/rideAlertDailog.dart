@@ -21,6 +21,8 @@ class RideAlerts extends StatelessWidget {
       .child("Drivers")
       .child(FirebaseAuth.instance.currentUser!.uid)
       .child("newRide");
+  DatabaseReference reqRideRef = db.child("ride_requests");
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -224,15 +226,8 @@ class RideAlerts extends StatelessWidget {
                       ),
                       child: FlatButton(
                           onPressed: () async {
-                            await driverRideRef.set(rideDetails.rideId);
+                            //await driverRideRef.set(rideDetails.rideId);
                             checkRideAvailability(context);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MapPage(
-                                          refDB: db,
-                                          rideInfo: rideDetails,
-                                        )));
                           },
                           child: Text(
                             "Accept".toUpperCase(),
@@ -277,6 +272,7 @@ class RideAlerts extends StatelessWidget {
       } else {
         Fluttertoast.showToast(msg: "Ride not Exist");
       }
+
       if (rideId == rideDetails.rideId) {
         driverRideRef.set("ride-accepted");
         db
@@ -289,6 +285,19 @@ class RideAlerts extends StatelessWidget {
             .child(rideId)
             .child("driver_id")
             .set(FirebaseAuth.instance.currentUser!.uid);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MapPage(
+                      refDB: db,
+                      rideInfo: rideDetails,
+                    )));
+      } else if (rideId == "Request Time Out") {
+        Fluttertoast.showToast(msg: "Ride Timed Out");
+        Navigator.pop(context);
+      } else if (rideId == "cancelled") {
+        Fluttertoast.showToast(msg: "Ride Cancelled");
+        Navigator.pop(context);
       }
     });
   }

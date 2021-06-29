@@ -416,13 +416,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             });
             print(rideDetails);
             rideD = rideDetails;
-            if (data.value["ride-status"].toString() == "waiting")
-              showDialog(
-                context: context,
-                builder: (BuildContext context) => RideAlerts(
-                  rideDetails: rideDetails,
-                ),
-              );
+            showDialog(
+              context: context,
+              builder: (BuildContext context) => RideAlerts(
+                rideDetails: rideDetails,
+              ),
+            );
           }
           // ignore: unnecessary_null_comparison
         });
