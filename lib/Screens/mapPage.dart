@@ -13,6 +13,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:ots_driver_app/utilities/configMaps.dart';
 import 'package:ots_driver_app/utilities/constants.dart';
 import 'package:ots_driver_app/utilities/requestAssistants.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class MapPage extends StatefulWidget {
   final DatabaseReference refDB;
@@ -509,7 +510,9 @@ class _MapPageState extends State<MapPage> {
                                                     Text(
                                                         widget.rideInfo
                                                             .dropOffAddress
-                                                            .toString(),
+                                                            .toString()
+                                                            .replaceAll(
+                                                                ',', '\n'),
                                                         overflow: TextOverflow
                                                             .ellipsis,
                                                         maxLines: 3,
@@ -525,7 +528,7 @@ class _MapPageState extends State<MapPage> {
                                                 ),
                                               ),
                                               SizedBox(
-                                                height: 5,
+                                                height: 15,
                                               ),
                                               Center(
                                                 child: Container(
@@ -538,32 +541,63 @@ class _MapPageState extends State<MapPage> {
                                                         BorderRadius.circular(
                                                             6),
                                                   ),
-                                                  child: Row(
-                                                    children: [
-                                                      SizedBox(
-                                                        width: 20,
-                                                      ),
-                                                      Center(
-                                                        child: Text(
-                                                          "Arrived!",
-                                                          style: TextStyle(
-                                                              fontSize: 22,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              color:
-                                                                  Colors.white),
+                                                  child: TextButton(
+                                                    onPressed: () {
+                                                      Alert(
+                                                              context: context,
+                                                              title:
+                                                                  "Pick up Rider",
+                                                              content:
+                                                                  Container(
+                                                                padding: EdgeInsets
+                                                                    .only(
+                                                                        left:
+                                                                            20),
+                                                                child: Text(
+                                                                  "Please first go to rider pick up location and then click Arrived Button",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color:
+                                                                          scText),
+                                                                ),
+                                                              ),
+                                                              style: AlertStyle(
+                                                                isCloseButton:
+                                                                    true,
+                                                              ),
+                                                              buttons: [],
+                                                              type: AlertType
+                                                                  .warning)
+                                                          .show();
+                                                    },
+                                                    child: Row(
+                                                      children: [
+                                                        SizedBox(
+                                                          width: 20,
                                                         ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 100,
-                                                      ),
-                                                      Icon(
-                                                        Icons.drive_eta_sharp,
-                                                        size: 40,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ],
+                                                        Center(
+                                                          child: Text(
+                                                            "Arrived!",
+                                                            style: TextStyle(
+                                                                fontSize: 22,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          width: 100,
+                                                        ),
+                                                        Icon(
+                                                          Icons.drive_eta_sharp,
+                                                          size: 40,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               )

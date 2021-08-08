@@ -123,7 +123,7 @@ class RideAlerts extends StatelessWidget {
                 Text("From : ",
                     style: TextStyle(
                       letterSpacing: 1.5,
-                      fontSize: 13.0,
+                      fontSize: 12.0,
                       fontWeight: FontWeight.normal,
                       fontFamily: 'OpenSans',
                     )),
@@ -143,8 +143,7 @@ class RideAlerts extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Colors.black,
-                              letterSpacing: 1.5,
-                              fontSize: 18.0,
+                              fontSize: 14.0,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'OpenSans',
                             )),
@@ -158,7 +157,7 @@ class RideAlerts extends StatelessWidget {
                 Text("To: ",
                     style: TextStyle(
                       letterSpacing: 1.5,
-                      fontSize: 13.0,
+                      fontSize: 12.0,
                       fontWeight: FontWeight.normal,
                       fontFamily: 'OpenSans',
                     )),
@@ -175,13 +174,15 @@ class RideAlerts extends StatelessWidget {
                       SizedBox(
                         width: 10,
                       ),
-                      Text(rideDetails.dropOffAddress.toString(),
+                      Text(
+                          rideDetails.dropOffAddress
+                              .toString()
+                              .replaceAll(",", '\n'),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 3,
                           style: TextStyle(
                             color: Colors.black87,
-                            letterSpacing: 1.5,
-                            fontSize: 18.0,
+                            fontSize: 14.0,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'OpenSans',
                           ))
