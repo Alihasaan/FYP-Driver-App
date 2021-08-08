@@ -53,191 +53,197 @@ class RideAlerts extends StatelessWidget {
                 BoxShadow(
                     color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
               ]),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  color: primary,
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    "New Ride Request!",
-                    style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: primary,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "New Ride Request!",
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: primary,
-                      child: ClipOval(
-                        child: SizedBox(
-                            width: 80,
-                            height: 80,
-                            child: Image.network(
-                                rideDetails.userPhotoURL.toString())),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 21,
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          rideDetails.userName.toString(),
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w600),
+                SizedBox(
+                  height: 20,
+                ),
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: primary,
+                        child: ClipOval(
+                          child: SizedBox(
+                              width: 80,
+                              height: 80,
+                              child: Image.network(
+                                  rideDetails.userPhotoURL.toString())),
                         ),
-                        Text(rideDetails.userPhone.toString(),
+                      ),
+                      SizedBox(
+                        width: 21,
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            rideDetails.userName.toString(),
+                            style: TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.w600),
+                          ),
+                          Text(rideDetails.userPhone.toString(),
+                              style: TextStyle(
+                                color: Colors.black,
+                                letterSpacing: 1.5,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'OpenSans',
+                              ))
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Text("From : ",
+                    style: TextStyle(
+                      letterSpacing: 1.5,
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: 'OpenSans',
+                    )),
+                Container(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.pin_drop_rounded,
+                          size: 40, color: Colors.lightBlueAccent),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        child: Text(rideDetails.pickUpAddress.toString(),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Colors.black,
                               letterSpacing: 1.5,
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'OpenSans',
-                            ))
-                      ],
-                    ),
-                  ],
+                            )),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Text("From : ",
-                  style: TextStyle(
-                    letterSpacing: 1.5,
-                    fontSize: 13.0,
-                    fontWeight: FontWeight.normal,
-                    fontFamily: 'OpenSans',
-                  )),
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.pin_drop_rounded,
-                        size: 40, color: Colors.lightBlueAccent),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: Text(rideDetails.pickUpAddress.toString(),
-                          maxLines: 3,
+                SizedBox(
+                  height: 15,
+                ),
+                Text("To: ",
+                    style: TextStyle(
+                      letterSpacing: 1.5,
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: 'OpenSans',
+                    )),
+                Container(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.pin_drop_outlined,
+                        size: 40,
+                        color: Colors.amberAccent,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(rideDetails.dropOffAddress.toString(),
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 3,
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.black87,
                             letterSpacing: 1.5,
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'OpenSans',
-                          )),
+                          ))
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Divider(
+                  color: Colors.green,
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "Decline".toUpperCase(),
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.white),
+                            )),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 50,
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: primary,
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: FlatButton(
+                            onPressed: () async {
+                              //await driverRideRef.set(rideDetails.rideId);
+                              checkRideAvailability(context);
+                            },
+                            child: Text(
+                              "Accept".toUpperCase(),
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.white),
+                            )),
+                      ),
                     )
                   ],
                 ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text("To: ",
-                  style: TextStyle(
-                    letterSpacing: 1.5,
-                    fontSize: 13.0,
-                    fontWeight: FontWeight.normal,
-                    fontFamily: 'OpenSans',
-                  )),
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.pin_drop_outlined,
-                      size: 40,
-                      color: Colors.amberAccent,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(rideDetails.dropOffAddress.toString(),
-                        style: TextStyle(
-                          color: Colors.black87,
-                          letterSpacing: 1.5,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'OpenSans',
-                        ))
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Divider(
-                color: Colors.green,
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: FlatButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            "Decline".toUpperCase(),
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          )),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 50,
-                  ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: primary,
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: FlatButton(
-                          onPressed: () async {
-                            //await driverRideRef.set(rideDetails.rideId);
-                            checkRideAvailability(context);
-                          },
-                          child: Text(
-                            "Accept".toUpperCase(),
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          )),
-                    ),
-                  )
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ), // bottom part
         Positioned(

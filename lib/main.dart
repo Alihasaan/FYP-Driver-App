@@ -353,8 +353,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                 channel.id,
                 channel.name,
                 channel.description,
+                timeoutAfter: 2500,
                 icon: android.smallIcon,
-                // other properties...
               ),
             ));
       }

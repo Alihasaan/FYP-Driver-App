@@ -146,7 +146,7 @@ class _InfoFromState extends State<InfoFrom> {
                       return "CNIC Can not be empty.";
                     } else if (value.length <= 2) {
                       return "CNIC too Short";
-                    } else if (value.length > 15) {
+                    } else if (value.length > 13) {
                       return "CNIC too Long";
                     } else if (value.contains(RegExp(r'[A-Z]'))) {
                       return "CNIC cannot contains Alphabets";
