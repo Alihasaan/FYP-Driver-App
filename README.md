@@ -1,10 +1,10 @@
 # ots_driver_app
+This Flutter project was developed as a final year project for my university.
 
-A Flutter application for the driver side of OTS.
+Getting Started
+There are two app one driver side and one Client/User side.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
+This is the Driver Side. User Side : https://github.com/Alihasaan/Final-Year-Project
 
 A few resources to get you started if this is your first Flutter project:
 
